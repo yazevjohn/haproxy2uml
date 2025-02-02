@@ -45,9 +45,6 @@ def haproxy_to_plantuml(config_file):
         plantuml += "}\n\n"
     plantuml += "}\n\n"
 
-
-
-
     # Create classes for each backend
     plantuml += "package Backends <<Folder>> {\n"
     for backend in configuration.backends:
