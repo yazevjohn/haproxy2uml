@@ -5,6 +5,14 @@ Convert HAproxy config 2 UML diagram
 ```bash
 bash$ pip install -r requirements.txt
 ```
+# Usage
+
+- usage example
+```bash
+python main.py --config_file 'haproxy.cfg' 
+```
+
+- filter usage example
 ```bash
 python main.py --config_file 'haproxy.cfg' --frontend 'unsecured'
 ```

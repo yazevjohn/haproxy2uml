@@ -87,11 +87,11 @@ def create_classes_for_backends(configuration):
     return plantuml
 
 
-def create_relationships(configuration):
+def create_relationships(configuration, frontend_filter: str, backend_filter: str):
     # Create relationships
     plantuml = ""
     for frontend in configuration.frontends:
-        if frontend.name == frontend_filter:
+        if frontend_filter and frontend.name == frontend_filter:
             for use_backend in frontend.usebackends():
                 if use_backend.is_default:
                     plantuml += f'"{frontend.name}" --> "{use_backend.backend_name}" #line:green;line.bold;text:green : Default\n'
@@ -111,9 +111,9 @@ def haproxy_to_plantuml(config_file):
 
     plantuml += create_class_global(configuration)
     plantuml += create_class_defaults(configuration)
-    plantuml += create_classes_for_frontends(configuration, frontend_filter)
+    plantuml += create_classes_for_frontends(configuration, frontend_filter=None)
     plantuml += create_classes_for_backends(configuration)
-    plantuml += create_relationships(configuration)
+    plantuml += create_relationships(configuration, frontend_filter=None, backend_filter=None)
 
     # End the PlantUML diagram
     plantuml += "@enduml"
@@ -134,13 +134,23 @@ def parse_args(args):
 
 
 if __name__ == "__main__":
-    args = parse_args(sys.argv[1:])
-    if not os.path.exists(args.config_file):
-        print(f"Файл конфигурации '{args.config_file}' не найден")
-        sys.exit(1)
+    # if len(sys.argv) == 1:
+    #     print("Usage: python main.py --config_file '/path/to/haproxy.cfg' --frontend 'frontend_name'")
+    #     sys.exit(1)
+    if len(sys.argv) > 1:    
+        frontend_filter = None
+        backend_filter = None
+        args = parse_args(sys.argv[1:])
+        if not os.path.exists(args.config_file):
+            print(f"Файл конфигурации '{args.config_file}' не найден")
+            config_file = 'haproxy.cfg'
+            #sys.exit(1)
+        else:
+            config_file = args.config_file
+        frontend_filter = args.frontend
+        backend_filter = args.backend
     else:
-        config_file = args.config_file
-    frontend_filter = args.frontend
+        config_file = 'haproxy.cfg'
     plantuml_diagram = haproxy_to_plantuml(config_file)
     print(plantuml_diagram)
     # Сохранение PlantUML кода в файл
